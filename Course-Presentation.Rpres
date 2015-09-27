@@ -1,0 +1,80 @@
+Course-Presentation
+========================================================
+author: Zachary Paslay
+date: September 26
+
+
+Developing Data Products
+
+
+
+What is it?
+========================================================
+type: prompt
+This is a basic application that creates plots of the mtcars dataset variables against the associated gas milage. You select the variable you are intereted in and it creates the plot with an associated regression line for you! 
+
+Available Variables:
+  - Number of Cylinders
+  - Displacement
+  - Engine Horsepower
+  - Weight
+  - Number of Forward Gears
+  - Number of Carburetors
+
+Behind the Scenes, ui.R
+========================================================
+type: section
+<small>
+A condensed version of ui.R so it would fit into a slide.
+```{r,eval=FALSE}
+shinyUI(pageWithSidebar(
+  headerPanel('Quick MTcars Data Plot'),
+    sidebarPanel(
+    radioButtons("radio", label = h3("Radio buttons"),
+        choices = list("Number of Cylinders" = 'mtcars$cyl', 
+          #and so on for the rest
+    h3('Quick Documentation'),
+    #p('Documentation Text went here!')),
+    mainPanel(
+    p('Your Selected Variable'),
+    verbatimTextOutput("inputValue"),
+    plotOutput("plot1")
+    )))
+```
+</small>
+
+Server.R
+========================================================
+type:section
+Here's a quick look at the structure of server.R (though again only a condensed version due to size constraints.)  The basic idea is that it takes the input provided by ui.R, which is determined by the selected radio button, and then generates a plot of the associated variable against the mpg variable, which is then sent back to ui.R.<small>
+***
+```{r, eval=FALSE}
+shinyServer(
+  function(input, output) {output$inputValue<-renderPrint({input$radio})
+    output$plot1 <- renderPlot ({
+      if (input$radio=="mtcars$cyl"){
+        ggplot(mtcars, aes(cyl, mpg)) + geom_point() + geom_smooth(method='lm')+labs(title= 'Cylinders vs MPG')
+      }
+      else if (input$radio=="mtcars$hp"){
+        ggplot(mtcars, aes(hp, mpg)) + geom_point() + geom_smooth(method='lm')+labs(title= 'Horsepower vs MPG')}
+      ##and so on for the rest})
+```
+</small>
+
+Sample Output
+==================================================================
+type:prompt
+Here is an example of the graph that would be generated if the Weight variable were to be selected.
+
+
+```{r,echo=TRUE,eval=FALSE}
+library(ggplot2)
+ggplot(mtcars, aes(wt, mpg)) + geom_point() + geom_smooth(method='lm') +labs(title='Weight vs MPG')
+```
+
+***
+
+```{r,echo=FALSE}
+library(ggplot2)
+ggplot(mtcars, aes(wt, mpg)) + geom_point() + geom_smooth(method='lm')+labs(title='Weight vs MPG')
+```
